@@ -64,10 +64,10 @@ Windows: `./gradlew.bat build -x test`
 ### Running Test and Test2 main programs:
 
 __Test__:
-`java -cp build/libs/homework2.jar edu.vt.ece.Test <YOUR_ARGS>`
+`java -cp build/libs/homework2-1.0-SNAPSHOT.jar edu.vt.ece.Test <YOUR_ARGS>`
 
 __Test2__:
-`java -cp build/libs/homework2.jar edu.vt.ece.Test2 <YOUR_ARGS>`
+`java -cp build/libs/homework2-1.0-SNAPSHOT.jar edu.vt.ece.Test2 <YOUR_ARGS>`
 
 Replace `<YOUR_ARGS>` with the arguments you would like to pass to the respective programs. Please refer to the _Test.java_ and _Test2.java_ to identify the arguments.
 
