@@ -3,6 +3,8 @@ package edu.vt.ece.locks;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.vt.ece.bench.ThreadId;
 
+import static edu.vt.ece.util.DebugConfig.DEBUG;
+
 public class LockTwo implements Lock{
 
     private AtomicInteger victim;

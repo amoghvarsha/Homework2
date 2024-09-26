@@ -8,6 +8,8 @@ import edu.vt.ece.bench.SharedCounter;
 import edu.vt.ece.bench.TestThread;
 import edu.vt.ece.locks.*;
 
+import static edu.vt.ece.util.DebugConfig.DEBUG;
+
 public class Test {
 
     private static final int THREAD_COUNT = 2;
@@ -17,7 +19,8 @@ public class Test {
     private static final String PETERSON = "Peterson";
     private static final String FILTER = "Filter";
     private static final String BAKERY = "Bakery";
-
+    private static final String TREE_PETERSON = "TreePeterson";
+    
     public static void printArgs(String[] args) {
         System.out.println("\n************ Command-Line Arguments ************");
         if (args.length == 0) {
@@ -33,20 +36,21 @@ public class Test {
     public static void main(String[] args) {
 
         try {
-            printArgs(args);
+
+            if (DEBUG)
+                printArgs(args);
+            
             String lockClass = (args.length == 0 ? PETERSON : args[0]);
-            int threadCount = (args.length <= 1 ? 2 : Integer.parseInt(args[1]));
+            int threadCount  = (args.length <= 1 ? 2        : Integer.parseInt(args[1]));
 
             Lock lock;
+            
+            Class<?> lockClassObj = Class.forName("edu.vt.ece.locks." + lockClass);
 
-            if (lockClass.equals(FILTER) || lockClass.equals(BAKERY)) {
-                // Handle locks that require the number of threads as a constructor parameter
-                Class<?> lockClassObj = Class.forName("edu.vt.ece.locks." + lockClass);
+            if (lockClass.equals(FILTER) || lockClass.equals(BAKERY) || lockClass.equals(TREE_PETERSON)) { 
                 Constructor<?> lockConstructor = lockClassObj.getDeclaredConstructor(int.class);
                 lock = (Lock) lockConstructor.newInstance(threadCount);
             } else {
-                // Handle locks that do not require any parameters in the constructor
-                Class<?> lockClassObj = Class.forName("edu.vt.ece.locks." + lockClass);
                 Constructor<?> lockConstructor = lockClassObj.getDeclaredConstructor();
                 lock = (Lock) lockConstructor.newInstance();
             }

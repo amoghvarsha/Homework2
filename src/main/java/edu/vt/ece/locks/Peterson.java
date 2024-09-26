@@ -4,6 +4,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.vt.ece.bench.ThreadId;
 
+import static edu.vt.ece.util.DebugConfig.DEBUG;
+
 public class Peterson implements Lock{
 
     private AtomicBoolean flag[] = new AtomicBoolean[2];
@@ -13,6 +15,9 @@ public class Peterson implements Lock{
         flag[0] = new AtomicBoolean();
         flag[1] = new AtomicBoolean();
         victim = new AtomicInteger();
+        
+        if (DEBUG)
+            System.out.println("\nPeterson Lock with " + 2 + " threads initialized.");
     }
 
     @Override

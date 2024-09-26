@@ -3,6 +3,7 @@ package edu.vt.ece.locks;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.vt.ece.bench.ThreadId;
 
+import static edu.vt.ece.util.DebugConfig.DEBUG;
 
 public class Filter implements Lock{
     private AtomicInteger[] level;
@@ -19,6 +20,9 @@ public class Filter implements Lock{
             level[i] = new AtomicInteger();
             victim[i] = new AtomicInteger();
         }
+
+        if (DEBUG)
+            System.out.println("\nFilter Lock with " + n + " threads initialized.");
     }
 
     @Override
