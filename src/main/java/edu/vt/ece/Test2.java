@@ -12,14 +12,20 @@ import static edu.vt.ece.util.DebugConfig.DEBUG;
 
 public class Test2 {
 
-    private static final String LOCK_ONE = "LockOne";
-    private static final String LOCK_TWO = "LockTwo";
-    private static final String PETERSON = "Peterson";
-    private static final String FILTER = "Filter";
-    private static final String BAKERY = "Bakery";
+    private static final int L            = 4;
+    private static final int THREAD_COUNT = 2;
+    private static final int TOTAL_ITERS  = 64;
+
+    private static final String LOCK_ONE      = "LockOne";
+    private static final String LOCK_TWO      = "LockTwo";
+    private static final String PETERSON      = "Peterson";
+    private static final String FILTER        = "Filter";
+    private static final String BAKERY        = "Bakery";
+    private static final String L_BAKERY      = "LBakery";
     private static final String TREE_PETERSON = "TreePeterson";
     
-    public static void printArgs(String[] args) {
+    private static void printArgs(String[] args) {
+
         System.out.println("\n************ Command-Line Arguments ************");
         if (args.length == 0) {
             System.out.println("No arguments provided.");
@@ -31,45 +37,41 @@ public class Test2 {
         System.out.println("************************************************\n");
     }
 
+    private static Lock createLock(String lockClass, int threadCount)
+        throws ClassNotFoundException, NoSuchMethodException, 
+               IllegalAccessException, InvocationTargetException, 
+               InstantiationException {
 
-    public static void main(String[] args) {
+        Class<?> lockClassObj = Class.forName("edu.vt.ece.locks." + lockClass);
+        Constructor<?> lockConstructor;
 
-        try {
-            if (DEBUG)
-                printArgs(args);
-            
-            String lockClass = (args.length == 0 ? PETERSON : args[0]);
-            int threadCount  = (args.length <= 1 ? 2        : Integer.parseInt(args[1]));
-            int totalIters   = (args.length <= 2 ? 64000    : Integer.parseInt(args[2]));
+        switch (lockClass) {
+            case L_BAKERY:
+                lockConstructor = lockClassObj.getDeclaredConstructor(int.class, int.class);
+                return (Lock) lockConstructor.newInstance(L, threadCount);
 
-            // Prevent division by zero
-            if (threadCount <= 0) {
-                throw new IllegalArgumentException("Thread count must be greater than zero.");
-            }
+            case FILTER:
+            case BAKERY:
+            case TREE_PETERSON:
+                lockConstructor = lockClassObj.getDeclaredConstructor(int.class);
+                return (Lock) lockConstructor.newInstance(threadCount);
 
-            int iters = totalIters / threadCount;
-
-            for (int i = 0; i < 2; i++) {
-                run(lockClass, threadCount, iters);
-            }
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | InterruptedException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+            case LOCK_ONE:
+            case LOCK_TWO:
+            case PETERSON:
+            default:
+                lockConstructor = lockClassObj.getDeclaredConstructor();
+                return (Lock) lockConstructor.newInstance();
         }
     }
 
-    private static void run(String lockClass, int threadCount, int iters)
-            throws InterruptedException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        
-        Lock lock;
-        Class<?> lockClassObj = Class.forName("edu.vt.ece.locks." + lockClass);
 
-        if (lockClass.equals(FILTER) || lockClass.equals(BAKERY) || lockClass.equals(TREE_PETERSON)) {
-            Constructor<?> lockConstructor = lockClassObj.getDeclaredConstructor(int.class);
-            lock = (Lock) lockConstructor.newInstance(threadCount);
-        } else {
-            Constructor<?> lockConstructor = lockClassObj.getDeclaredConstructor();
-            lock = (Lock) lockConstructor.newInstance();
-        }
+    private static void run(String lockClass, int threadCount, int iters)
+        throws InterruptedException, ClassNotFoundException, 
+               IllegalAccessException, InstantiationException, 
+               NoSuchMethodException, InvocationTargetException {
+
+        Lock lock = createLock(lockClass, threadCount);
 
         final Counter counter = new SharedCounter(0, lock);
         final TestThread2[] threads = new TestThread2[threadCount];
@@ -90,6 +92,29 @@ public class Test2 {
         }
 
         System.out.println("Average time per thread is " + totalTime / threadCount + "ms");
-        
+    }
+
+    public static void main(String[] args) {
+
+        try {
+            if (DEBUG)
+                printArgs(args);
+            
+            String lockClass = (args.length == 0 ? PETERSON      : args[0]);
+            int threadCount  = (args.length <= 1 ? THREAD_COUNT  : Integer.parseInt(args[1]));
+            int totalIters   = (args.length <= 2 ? TOTAL_ITERS   : Integer.parseInt(args[2]));
+
+            if (threadCount <= 0 || totalIters <= 0) {
+                throw new IllegalArgumentException("Thread count and Total Iterations must be greater than zero.");
+            }
+
+            int iters = totalIters / threadCount;
+
+            for (int i = 0; i < 5; i++) {
+                run(lockClass, threadCount, iters);
+            }
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | InterruptedException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }
