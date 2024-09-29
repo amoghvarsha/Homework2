@@ -14,7 +14,7 @@ public class Peterson implements Lock{
     public Peterson() {
         flag[0] = new AtomicBoolean();
         flag[1] = new AtomicBoolean();
-        victim = new AtomicInteger();
+        victim  = new AtomicInteger();
         
         if (DEBUG)
             System.out.println("\nPeterson Lock with " + 2 + " threads initialized.");
