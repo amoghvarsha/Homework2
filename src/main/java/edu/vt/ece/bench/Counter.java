@@ -1,5 +1,7 @@
 package edu.vt.ece.bench;
 
+import static edu.vt.ece.util.DebugConfig.DEBUG;
+
 public class Counter {
 
     private int value;
@@ -8,8 +10,9 @@ public class Counter {
         value = c;
     }
 
-    public int getAndIncrement(){
-        //System.out.println("Thread " + ((TestThread)Thread.currentThread()).getThreadId() + " value " + value);
+    public int getAndIncrement() {
+        if (DEBUG)
+            System.out.println("Thread " + ((TestThread)Thread.currentThread()).getThreadId() + " value " + value);
         
         int temp = value;
         value = temp + 1;
