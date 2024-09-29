@@ -1,5 +1,5 @@
 package edu.vt.ece.util;
 
 public class DebugConfig {
-    public static boolean DEBUG = false;
+    public final static boolean DEBUG = false;
 }
