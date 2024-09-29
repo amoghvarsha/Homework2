@@ -12,8 +12,8 @@ import static edu.vt.ece.util.DebugConfig.DEBUG;
 
 public class Test {
 
-    private static final int L            = 4;
-    private static final int THREAD_COUNT = 2;
+    private static int L            = 4;
+    private static int THREAD_COUNT = 2;
 
     private static final String LOCK_ONE      = "LockOne";
     private static final String LOCK_TWO      = "LockTwo";
@@ -36,7 +36,7 @@ public class Test {
         System.out.println("************************************************\n");
     }
 
-    private static Lock createLock(String lockClass, int threadCount)
+    private static Lock createLock(String lockClass, int threadCount, int l)
     throws ClassNotFoundException, NoSuchMethodException, 
            IllegalAccessException, InvocationTargetException, 
            InstantiationException {
@@ -47,7 +47,7 @@ public class Test {
         switch (lockClass) {
             case L_BAKERY:
                 lockConstructor = lockClassObj.getDeclaredConstructor(int.class, int.class);
-                return (Lock) lockConstructor.newInstance(L, threadCount);
+                return (Lock) lockConstructor.newInstance(l, threadCount);
 
             case FILTER:
             case BAKERY:
@@ -64,12 +64,12 @@ public class Test {
         }
     }
 
-    private static void run(String lockClass, int threadCount)
+    private static void run(String lockClass, int threadCount, int l)
         throws InterruptedException, ClassNotFoundException, 
                 IllegalAccessException, InstantiationException, 
                 NoSuchMethodException, InvocationTargetException {
 
-        Lock lock = createLock(lockClass, threadCount);
+        Lock lock = createLock(lockClass, threadCount, l);
 
         final Counter counter = new SharedCounter(0, lock);
         final TestThread[] threads = new TestThread[threadCount];
@@ -97,12 +97,13 @@ public class Test {
             
             String lockClass = (args.length == 0 ? PETERSON     : args[0]);
             int threadCount  = (args.length <= 1 ? THREAD_COUNT : Integer.parseInt(args[1]));
+            int l            = (args.length <= 2 ? L            : Integer.parseInt(args[2]));
 
             if (threadCount <= 0 ) {
-                throw new IllegalArgumentException("Thread count and Total Iterations must be greater than zero.");
+                throw new IllegalArgumentException("Thread count must be greater than zero.");
             }
 
-            run(lockClass, threadCount);
+            run(lockClass, threadCount, l);
 
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | InterruptedException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
