@@ -1,10 +1,11 @@
 package edu.vt.ece.bench;
 
 public class TestThread2 extends Thread implements ThreadId {
+    
     private static int ID_GEN = 0;
-
     private Counter counter;
     private int id;
+    
     private long elapsed;
     private int iter;
 
